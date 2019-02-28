@@ -5,7 +5,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.pointlessgames.blite.renderers.FilledShapeRenderer;
+import com.pointlessgames.blite.renderers.CustomShapeRenderer;
+import com.pointlessgames.blite.utils.Colors;
 import com.pointlessgames.blite.utils.Settings;
 
 import java.util.Random;
@@ -36,10 +37,10 @@ public class Wall extends Position {
 	}
 
 	public void switchColor() {
-		color = color == Settings.colorDark ? Settings.colorBright : Settings.colorDark;
+		color = color == Colors.colorDark ? Colors.colorBright : Colors.colorDark;
 	}
 
-	public void draw(FilledShapeRenderer sR) {
+	public void draw(CustomShapeRenderer sR) {
 		sR.begin(ShapeRenderer.ShapeType.Filled);
 		sR.setColor(color);
 		sR.rect(pos.x, pos.y, size.x, size.y);

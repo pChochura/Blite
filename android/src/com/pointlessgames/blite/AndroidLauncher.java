@@ -11,7 +11,6 @@ public class AndroidLauncher extends AndroidApplication {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		config.useGLSurfaceView20API18 = true;
-		config.useGL30 = true;
 		initialize(new Blite(), config);
 	}
 }

@@ -5,7 +5,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
-import com.pointlessgames.blite.renderers.FilledShapeRenderer;
+import com.pointlessgames.blite.renderers.CustomShapeRenderer;
+import com.pointlessgames.blite.utils.Colors;
 import com.pointlessgames.blite.utils.DataCallback;
 import com.pointlessgames.blite.utils.Settings;
 
@@ -18,12 +19,12 @@ public class Player extends Acceleration {
 	public Player(Vector2 pos) {
 		this.pos = pos;
 		this.startPos = pos.cpy();
-		this.color = Settings.colorBright;
+		this.color = Colors.colorBright;
 		this.speed = new Vector2(Settings.startSpeed, 0);
 		this.acc = new Vector2(0, Settings.gravity);
 	}
 
-	public void draw(FilledShapeRenderer sR) {
+	public void draw(CustomShapeRenderer sR) {
 		float r = Settings.playerDiameter;
 		sR.begin(ShapeRenderer.ShapeType.Filled);
 
@@ -40,7 +41,7 @@ public class Player extends Acceleration {
 
 		sR.setColor(color);
 		sR.polygon(polygon.getTransformedVertices());
-		sR.setColor(color == Settings.colorDark ? Settings.colorBright : Settings.colorDark);
+		sR.setColor(color == Colors.colorDark ? Colors.colorBright : Colors.colorDark);
 		sR.ellipse(pos.x - r / 6, pos.y - r / 6, r / 3, r / 3);
 
 		sR.end();
@@ -58,7 +59,7 @@ public class Player extends Acceleration {
 	}
 
 	public void switchColor() {
-		color = color == Settings.colorDark ? Settings.colorBright : Settings.colorDark;
+		color = color == Colors.colorDark ? Colors.colorBright : Colors.colorDark;
 	}
 
 	public void increaseSpeed() {
@@ -66,7 +67,7 @@ public class Player extends Acceleration {
 	}
 
 	public void reset() {
-		color = Settings.colorBright;
+		color = Colors.colorBright;
 		pos = startPos.cpy();
 		speed.set(Settings.startSpeed, 0);
 	}

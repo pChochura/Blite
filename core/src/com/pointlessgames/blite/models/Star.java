@@ -6,7 +6,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.pointlessgames.blite.renderers.FilledShapeRenderer;
+import com.pointlessgames.blite.renderers.CustomShapeRenderer;
+import com.pointlessgames.blite.utils.Colors;
 import com.pointlessgames.blite.utils.Settings;
 import com.pointlessgames.blite.utils.Utils;
 
@@ -49,48 +50,14 @@ public class Star extends Position {
 		}
 	}
 
-	public void draw(FilledShapeRenderer sR) {
+	public void draw(CustomShapeRenderer sR) {
 		if(this.pos == null) return;
 		sR.begin(ShapeRenderer.ShapeType.Filled);
 
-		float[] vertices = new float[24];
-		float[] allVertices = new float[24];
-
-		if(fillFraction >= 0) {
-			allVertices[0] = vertices[0] = 0;
-			allVertices[1] = vertices[1] = 0;
-		}
-		for(float i = 0, j = 10; j >= 0; i += MathUtils.PI / Settings.starSpikes, j--) {
-			float sx, sy;
-			if(j % 2 == 1) {
-				sx = MathUtils.cos(i) * Settings.starRadius1;
-				sy = MathUtils.sin(i) * Settings.starRadius1;
-			} else {
-				sx = MathUtils.cos(i) * Settings.starRadius2;
-				sy = MathUtils.sin(i) * Settings.starRadius2;
-			}
-			if(j <= 10 * fillFraction) {
-				vertices[(int) (2 * j + 2)] = sx;
-				vertices[(int) (2 * j + 3)] = sy;
-			}
-			allVertices[(int) (2 * j + 2)] = sx;
-			allVertices[(int) (2 * j + 3)] = sy;
-		}
-
-		Polygon fractionStar = new Polygon(vertices);
-		fractionStar.rotate(angle);
-		fractionStar.setScale(scale, scale);
-		fractionStar.translate(pos.x, pos.y);
-
-		Polygon wholeStar = new Polygon(allVertices);
-		wholeStar.rotate(angle);
-		wholeStar.setScale(scale, scale);
-		wholeStar.translate(pos.x, pos.y);
-
-		sR.setColor(Settings.colorDark);
-		sR.polygon(wholeStar.getTransformedVertices());
-		sR.setColor(Settings.colorStar);
-		sR.polygon(fractionStar.getTransformedVertices());
+		sR.setColor(Colors.colorDark);
+		sR.star(pos.x, pos.y, Settings.starRadius1, Settings.starRadius2, Settings.starSpikes, angle, scale, fillFraction);
+		sR.setColor(Colors.colorStar);
+		sR.star(pos.x, pos.y, Settings.starRadius1, Settings.starRadius2, Settings.starSpikes, angle, scale, 1);
 
 		sR.end();
 	}

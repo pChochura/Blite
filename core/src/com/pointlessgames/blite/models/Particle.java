@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
-import com.pointlessgames.blite.renderers.FilledShapeRenderer;
-import com.pointlessgames.blite.utils.Settings;
+import com.pointlessgames.blite.renderers.CustomShapeRenderer;
+import com.pointlessgames.blite.utils.Colors;
 
 import java.util.ArrayList;
 
@@ -101,14 +101,14 @@ public class Particle extends Acceleration {
 			if(shape != null) {
 				shape.setPosition(pos.x, pos.y);
 				shape.setRotation(speed.angle());
-				color = color.cpy().lerp(Settings.colorBackground, 1 - alpha.a);
+				color = color.cpy().lerp(Colors.colorBackground, 1 - alpha.a);
 			} else color.a = alpha.a;
 
 			if(life <= 0) active = false;
 		}
 	}
 
-	public void draw(FilledShapeRenderer sR) {
+	public void draw(CustomShapeRenderer sR) {
 		sR.begin(ShapeRenderer.ShapeType.Filled);
 		sR.setColor(color);
 
@@ -130,14 +130,14 @@ public class Particle extends Acceleration {
 	public static ArrayList<Particle> getExplosionParticles(Vector2 pos, float minSize, float maxSize, float amount) {
 		ArrayList<Particle> particles = new ArrayList<>();
 
-		Color dark = Settings.colorDark.cpy();
+		Color dark = Colors.colorDark.cpy();
 		for(int i = 0; i < amount; i++) {
 			float lerp = MathUtils.random(0f, 1f);
 			float size = MathUtils.random(minSize, maxSize);
 			Vector2 speed = new Vector2(1, 0).setAngle(MathUtils.random(360f)).setLength(MathUtils.random(5f * ratio, 10f * ratio));
 			Vector2 acc = new Vector2(speed.cpy().scl(-MathUtils.random(0f, 2f * ratio)));
-			Particle p = new Particle(pos.cpy(), dark.cpy().lerp(Settings.colorBright, lerp), new Alpha(1), size)
-					.colorful(dark.cpy().lerp(Settings.colorBright, lerp))
+			Particle p = new Particle(pos.cpy(), dark.cpy().lerp(Colors.colorBright, lerp), new Alpha(1), size)
+					.colorful(dark.cpy().lerp(Colors.colorBright, lerp))
 					.shrinking(0f)
 					.fading(new Alpha(0))
 					.living(1f);
