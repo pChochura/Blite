@@ -34,15 +34,21 @@ public class BackgroundStage extends Stage {
 
 		sR.begin(ShapeRenderer.ShapeType.Filled);
 
-		sR.setColor(Colors.colorHex1);
+		sR.setColor(Colors.colorHex2);
 		sR.hexagon(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() - 400 * ratio, Settings.hexagonSize);
 
+		sR.setColor(Colors.colorHex1);
 		sR.hexagon(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() - 400 * ratio, Settings.hexagonSize, fraction);
 
 		if(!stats.started) {
 			sR.setColor(Colors.colorHex2);
 			sR.hexagon(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2 - 150 * ratio, Settings.playerDiameter);
+		} else if(stats.timer != 0) {
+			sR.setColor(Colors.colorHex1);
+			sR.set(ShapeRenderer.ShapeType.Line);
+			sR.hexagon(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() - 400 * ratio, Settings.hexagonSize + Settings.timerThickness * 0.5f, stats.timer);
 		}
+
 		sR.end();
 	}
 
@@ -67,7 +73,7 @@ public class BackgroundStage extends Stage {
 	}
 
 	private void drawStars() {
-		if(!stats.started || stats.combo == Settings.starSpikes) {
+		if(!stats.started) {
 			sB.begin();
 			font.getData().setScale(0.3f);
 			font.setColor(Colors.colorText);
@@ -90,16 +96,3 @@ public class BackgroundStage extends Stage {
 		drawStars();
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

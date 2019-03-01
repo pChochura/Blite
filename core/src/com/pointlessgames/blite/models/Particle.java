@@ -124,7 +124,7 @@ public class Particle extends Acceleration {
 	}
 
 	public static ArrayList<Particle> getExplosionParticles(Vector2 pos, float minSize, float maxSize) {
-		return getExplosionParticles(pos, minSize, maxSize, MathUtils.random(15, 25) * ratio);
+		return getExplosionParticles(pos, minSize, maxSize, MathUtils.random(15, 25));
 	}
 
 	public static ArrayList<Particle> getExplosionParticles(Vector2 pos, float minSize, float maxSize, float amount) {

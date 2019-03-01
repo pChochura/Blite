@@ -12,6 +12,10 @@ import com.pointlessgames.blite.utils.Utils;
 
 public class CustomShapeRenderer extends ShapeRenderer {
 
+	public CustomShapeRenderer() {
+		setAutoShapeType(true);
+	}
+
 	private EarClippingTriangulator ear = new EarClippingTriangulator();
 
 	public void polygon(float[] vertices, int offset, int count) {
@@ -110,6 +114,7 @@ public class CustomShapeRenderer extends ShapeRenderer {
 
 			polygon(hex.getTransformedVertices());
 		} else {
+			set(ShapeType.Filled);
 			int corners = MathUtils.floor(fillFraction * 6);
 			float px = MathUtils.cos(0) * radius, py = MathUtils.sin(0) * radius;
 			for(float i = 1; i <= corners; i++) {
@@ -128,6 +133,7 @@ public class CustomShapeRenderer extends ShapeRenderer {
 			float finalX = Utils.map(fillFraction, endT, startT, dx, px);
 			float finalY = Utils.map(fillFraction, endT, startT, dy, py);
 			rectLine(px + x, py + y, finalX + x, finalY + y, Settings.timerThickness);
+			set(ShapeType.Line);
 		}
 	}
 	

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.pointlessgames.blite.models.Perk;
 import com.pointlessgames.blite.models.Stats;
 import com.pointlessgames.blite.renderers.CustomShapeRenderer;
 import com.pointlessgames.blite.stages.BackgroundStage;
@@ -11,6 +12,7 @@ import com.pointlessgames.blite.stages.GameStage;
 import com.pointlessgames.blite.stages.PerksStage;
 import com.pointlessgames.blite.utils.Colors;
 import com.pointlessgames.blite.utils.Settings;
+import com.pointlessgames.blite.utils.SoundManager;
 
 import static com.pointlessgames.blite.utils.Settings.ratio;
 
@@ -37,6 +39,8 @@ public class StartScreen extends BaseScreen {
 		addStage(new GameStage(sR, sB, stats));
 		addStage(new PerksStage(sR, sB, stats));
 
+		SoundManager.loadSounds();
+
 		configureFont();
 	}
 
@@ -55,5 +59,7 @@ public class StartScreen extends BaseScreen {
 		font.dispose();
 		sR.dispose();
 		sB.dispose();
+
+		SoundManager.dispose();
 	}
 }

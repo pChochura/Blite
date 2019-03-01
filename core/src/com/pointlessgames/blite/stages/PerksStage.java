@@ -1,25 +1,26 @@
 package com.pointlessgames.blite.stages;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Align;
-import com.pointlessgames.blite.models.Alpha;
-import com.pointlessgames.blite.models.Particle;
+import com.pointlessgames.blite.models.FloatingText;
 import com.pointlessgames.blite.models.Perk;
 import com.pointlessgames.blite.models.Star;
 import com.pointlessgames.blite.models.Stats;
 import com.pointlessgames.blite.renderers.CustomShapeRenderer;
-import com.pointlessgames.blite.screens.StartScreen;
 import com.pointlessgames.blite.utils.Colors;
 import com.pointlessgames.blite.utils.Settings;
-import com.pointlessgames.blite.utils.Utils;
+import com.pointlessgames.blite.utils.SoundManager;
+
+import java.util.ArrayList;
 
 import static com.pointlessgames.blite.screens.StartScreen.font;
 import static com.pointlessgames.blite.utils.Settings.ratio;
@@ -34,6 +35,8 @@ public class PerksStage extends Stage {
 	private float xOffset;
 	private float yOffset;
 
+	private ArrayList<Actor> floatingTexts;
+
 	public PerksStage(CustomShapeRenderer sR, SpriteBatch sB, Stats stats) {
 		this.sR = sR;
 		this.sB = sB;
@@ -42,6 +45,8 @@ public class PerksStage extends Stage {
 		selectedPerk = -1;
 		xOffset = 120 * ratio * (1 + MathUtils.cos(MathUtils.PI2 / 6f)) + 20 * ratio;
 		yOffset = 2 * 120 * ratio * MathUtils.cos(MathUtils.PI2 / 6f) + 20 * ratio;
+
+		floatingTexts = new ArrayList<>();
 	}
 
 	private void drawPerksButtons() {
@@ -83,16 +88,47 @@ public class PerksStage extends Stage {
 		sB.end();
 	}
 
+	private void timeOut() {
+		stats.combo -= Settings.starSpikes;
+		if(stats.started) {
+			if(selectedPerk == -1) selectedPerk = MathUtils.random(Perk.FREEZE, Perk.SIZE);
+			Perk.applyPerk(selectedPerk, stats.player, stats.wall);
+
+			addPerkText();
+
+			if(Settings.soundsOn)
+				SoundManager.powerup.play(0.5f);
+		}
+		selectedPerk = -1;
+	}
+
+	private void addPerkText() {
+		FloatingText fT = new FloatingText(font).setText(Perk.getText(selectedPerk)).setTextSize(0.75f).setTargetWidth(Gdx.graphics.getWidth());
+		fT.setColor(Colors.colorText.cpy());
+		fT.setPosition(0, Gdx.graphics.getHeight() / 2f);
+		fT.addAction(Actions.sequence(
+				Actions.parallel(Actions.moveBy(0, 100 * ratio, Settings.duration, Interpolation.exp5Out), Actions.alpha(0, Settings.duration, Interpolation.exp5Out)),
+				Actions.run(() -> floatingTexts.remove(fT))));
+
+		floatingTexts.add(fT);
+	}
+
 	@Override public void draw() {
-		if(!stats.started) {
+		if(!stats.started || stats.timer != 0) {
 			drawPerksButtons();
 			drawPerksIcons();
 		} if(selectedPerk != -1 && !stats.started)
 			drawUpdatePrize();
+
+		for(Actor a : floatingTexts)
+			a.draw(sB, 1);
 	}
 
 	@Override public void act(float delta) {
+		if(stats.started && stats.timer > 0) stats.updateTimer(delta, this::timeOut);
 
+		for(Actor a : floatingTexts)
+			a.act(delta);
 	}
 
 	private int checkPerkSelection(Vector2 pos) {
@@ -109,23 +145,40 @@ public class PerksStage extends Stage {
 	@Override public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		Vector2 pos = new Vector2(screenX, screenY);
 		int perkSelection = checkPerkSelection(pos);
-		if((perkSelection != -1 || perkSelection != selectedPerk) && (stats.timer != 0 || !stats.started)) {
-			if(stats.timer == 0 || perkSelection != -1) {
-				if(perkSelection != -1 && perkSelection == selectedPerk) {
-					if(stats.timer != 0) stats.timer = 0.01f;
-					int prize = Perk.prize[perkSelection][Perk.level[perkSelection]];
-					if(!stats.started && stats.stars >= prize && Perk.level[perkSelection] < Perk.maxLevel) {
-						stats.timer = 0.01f;
-						stats.stars -= prize;
-						Perk.level[perkSelection] = MathUtils.clamp(Perk.level[perkSelection] + 1, 0, Perk.maxLevel);
-						Gdx.app.getPreferences(Settings.SAVE).putInteger(Settings.STARS, stats.stars).flush();
-						Perk.savePerks();
-					}
-				}
+
+		if(stats.started) {
+			if(stats.timer == 0) return false;
+			else if(perkSelection != -1) {
+				if(perkSelection == selectedPerk) stats.timer = 0.01f;
 				selectedPerk = perkSelection;
-				return true;
+				if(Settings.soundsOn)
+					SoundManager.pick.play(0.5f);
+			} else return false;
+		} else if(perkSelection == -1) {
+			if(selectedPerk == -1) return false;
+			else {
+				selectedPerk = perkSelection;
+				if(Settings.soundsOn)
+					SoundManager.pick.play(0.5f);
 			}
+		} else {
+			if(selectedPerk == perkSelection) {
+				int prize = Perk.prize[perkSelection][Perk.level[perkSelection]];
+				if(stats.stars >= prize && Perk.level[perkSelection] < Perk.maxLevel) {
+					stats.stars -= prize;
+					Perk.level[perkSelection] = MathUtils.clamp(Perk.level[perkSelection] + 1, 0, Perk.maxLevel);
+					Gdx.app.getPreferences(Settings.SAVE).putInteger(Settings.STARS, stats.stars).flush();
+					Perk.savePerks();
+
+					addPerkText();
+				} else if(Settings.soundsOn)
+					SoundManager.pick2.play(0.5f);
+			}
+			selectedPerk = perkSelection;
+			if(Settings.soundsOn)
+				SoundManager.pick.play(0.5f);
 		}
-		return !stats.started && selectedPerk != perkSelection && (selectedPerk = perkSelection) == -1;
+
+		return true;
 	}
 }

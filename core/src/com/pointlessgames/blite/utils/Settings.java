@@ -30,5 +30,7 @@ public class Settings {
 	public static final float starRadius1 = 50 * ratio;
 	public static final float starRadius2 = 30 * ratio;
 	public static final float starProbability = 0.6f;
-	public static final float starSpikes = 5;
+	public static final int starSpikes = 5;
+
+	public static boolean soundsOn = true;
 }
